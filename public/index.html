@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+	<meta name="generator" content="Hugo 0.140.2"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kettler to Strava on Esp32 | Connecting the Kettler Crosstrainer CTR3 to the cloud</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+    </ul>
+    <hr/>
+    </nav>
+
+
+
+
+<h1 id="connecting-a-kettler-crosstrainer-ctr3-to-strava-with-an-esp32">Connecting a Kettler Crosstrainer CTR3 to Strava with an ESP32</h1>
+<p>If you own a Kettler Crosstrainer CTR3 and are eager to track your workouts on Strava, you&rsquo;re not alone. Despite its advanced features, the CTR3 lacks native Strava integration. However, with some creativity and technology, you can bridge this gap using its serial port and an ESP32 microcontroller. Here&rsquo;s how you can make it happen.</p>
+<h2 id="what-youll-need">What You&rsquo;ll Need</h2>
+<ul>
+<li><strong>Kettler Crosstrainer CTR3</strong></li>
+<li><strong>ESP32 microcontroller</strong></li>
+<li><strong>Serial-to-TTL adapter</strong> (if needed, to connect the serial port)</li>
+<li><strong>USB cable and power supply</strong></li>
+<li><strong>Basic soldering tools</strong> (optional, depending on your setup)</li>
+<li><strong>Programming environment</strong> (Arduino IDE or PlatformIO)</li>
+</ul>
+<h2 id="the-concept">The Concept</h2>
+<p>The Kettler CTR3 outputs workout data via a serial port, typically using a simple protocol to communicate speed, distance, calories, and heart rate. By connecting the ESP32 to the serial port, you can capture this data and format it for transmission to Strava via its API.</p>
+<h3 id="key-steps">Key Steps</h3>
+<ol>
+<li>
+<p><strong>Identify the Serial Port</strong>
+Locate the serial port on the CTR3. It may be labeled in the user manual or on the device itself. Ensure you have the appropriate adapter to connect the port to the ESP32.</p>
+</li>
+<li>
+<p><strong>Capture the Data</strong>
+Use the ESP32 to read data from the CTR3. Most Kettler devices use standard baud rates (e.g., 9600 bps). You&rsquo;ll need to decode the protocol, which often involves parsing simple ASCII strings.</p>
+</li>
+<li>
+<p><strong>Process the Data</strong>
+Write a program for the ESP32 to process the data. Extract key metrics like speed, distance, and heart rate, and format them for compatibility with Strava.</p>
+</li>
+<li>
+<p><strong>Send Data to Strava</strong>
+Use the ESP32’s Wi-Fi capability to send the workout data to Strava. This requires implementing the Strava API, which involves:</p>
+<ul>
+<li>Registering for a Strava Developer account</li>
+<li>Obtaining an API access token</li>
+<li>Sending activity data as a POST request</li>
+</ul>
+</li>
+<li>
+<p><strong>Test and Refine</strong>
+Test your setup thoroughly to ensure accurate data transmission. You might need to fine-tune parsing logic or API calls.</p>
+</li>
+</ol>
+<h2 id="example-code">Example Code</h2>
+<p>Here’s a simplified example of how you might start:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;WiFi.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;HTTPClient.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Wi-Fi credentials
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> ssid <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Your_SSID&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Your_PASSWORD&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Strava API endpoint
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> strava_endpoint <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.strava.com/api/v3/uploads&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> access_token <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Your_Access_Token&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setup</span>() {
+</span></span><span style="display:flex;"><span>    Serial.begin(<span style="color:#ae81ff">9600</span>); <span style="color:#75715e">// For CTR3 serial communication
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    WiFi.begin(ssid, password);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (WiFi.status() <span style="color:#f92672">!=</span> WL_CONNECTED) {
+</span></span><span style="display:flex;"><span>        delay(<span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>        Serial.println(<span style="color:#e6db74">&#34;Connecting to Wi-Fi...&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    Serial.println(<span style="color:#e6db74">&#34;Connected to Wi-Fi&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">loop</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (Serial.available()) {
+</span></span><span style="display:flex;"><span>        String data <span style="color:#f92672">=</span> Serial.readString();
+</span></span><span style="display:flex;"><span>        Serial.println(<span style="color:#e6db74">&#34;Data received: &#34;</span> <span style="color:#f92672">+</span> data);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Process and format data for Strava (not implemented here)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Example HTTP request to Strava
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        HTTPClient http;
+</span></span><span style="display:flex;"><span>        http.begin(strava_endpoint);
+</span></span><span style="display:flex;"><span>        http.addHeader(<span style="color:#e6db74">&#34;Authorization&#34;</span>, <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> String(access_token));
+</span></span><span style="display:flex;"><span>        http.addHeader(<span style="color:#e6db74">&#34;Content-Type&#34;</span>, <span style="color:#e6db74">&#34;application/json&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> httpResponseCode <span style="color:#f92672">=</span> http.POST(<span style="color:#e6db74">&#34;{</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">name</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">Workout</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">,</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">type</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">:</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">Ride</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">}&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (httpResponseCode <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>            Serial.println(<span style="color:#e6db74">&#34;Data sent to Strava&#34;</span>);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            Serial.println(<span style="color:#e6db74">&#34;Error sending data&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        http.end();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="challenges-and-tips">Challenges and Tips</h2>
+<ul>
+<li><strong>Understanding the Protocol</strong>: If the serial protocol is undocumented, you&rsquo;ll need to reverse-engineer it. Use a serial monitor to inspect the raw output.</li>
+<li><strong>Strava API Limits</strong>: Strava&rsquo;s API has rate limits, so plan your data uploads accordingly.</li>
+<li><strong>Power Management</strong>: Ensure your ESP32 is properly powered to handle Wi-Fi transmission.</li>
+</ul>
+<h2 id="conclusion">Conclusion</h2>
+<p>Connecting your Kettler Crosstrainer CTR3 to Strava is a rewarding project that enhances your workout experience. With an ESP32 and some programming skills, you can track your progress seamlessly. Happy hacking!</p>
+
+
+<ul>
+  
+  
+  
+  <li>
+    <span class="date">2025/01/05</span>
+    <a href="/posts/kettler-to-strava-on-esp32/">Kettler to Strava on Esp32</a>
+  </li>
+  
+</ul>
+
+  <footer>
+  
+  
+  </footer>
+  </body>
+</html>
+

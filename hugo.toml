@@ -1,0 +1,4 @@
+baseURL = 'https://andros.blog/'
+languageCode = 'en-us'
+title = 'Connecting the Kettler Crosstrainer CTR3 to the cloud'
+theme = 'hugo-xmin'

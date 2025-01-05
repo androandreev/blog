@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kettler to Strava on Esp32 on Connecting the Kettler Crosstrainer CTR3 to the cloud</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content in Kettler to Strava on Esp32 on Connecting the Kettler Crosstrainer CTR3 to the cloud</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 05 Jan 2025 15:45:24 +0100</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kettler to Strava on Esp32</title>
+      <link>http://localhost:1313/posts/kettler-to-strava-on-esp32/</link>
+      <pubDate>Sun, 05 Jan 2025 15:45:24 +0100</pubDate>
+      <guid>http://localhost:1313/posts/kettler-to-strava-on-esp32/</guid>
+      <description>&lt;h1 id=&#34;connecting-a-kettler-crosstrainer-ctr3-to-strava-with-an-esp32&#34;&gt;Connecting a Kettler Crosstrainer CTR3 to Strava with an ESP32&lt;/h1&gt;&#xA;&lt;p&gt;If you own a Kettler Crosstrainer CTR3 and are eager to track your workouts on Strava, you&amp;rsquo;re not alone. Despite its advanced features, the CTR3 lacks native Strava integration. However, with some creativity and technology, you can bridge this gap using its serial port and an ESP32 microcontroller. Here&amp;rsquo;s how you can make it happen.&lt;/p&gt;&#xA;&lt;h2 id=&#34;what-youll-need&#34;&gt;What You&amp;rsquo;ll Need&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Kettler Crosstrainer CTR3&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;ESP32 microcontroller&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Serial-to-TTL adapter&lt;/strong&gt; (if needed, to connect the serial port)&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;USB cable and power supply&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Basic soldering tools&lt;/strong&gt; (optional, depending on your setup)&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Programming environment&lt;/strong&gt; (Arduino IDE or PlatformIO)&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;the-concept&#34;&gt;The Concept&lt;/h2&gt;&#xA;&lt;p&gt;The Kettler CTR3 outputs workout data via a serial port, typically using a simple protocol to communicate speed, distance, calories, and heart rate. By connecting the ESP32 to the serial port, you can capture this data and format it for transmission to Strava via its API.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
